@@ -1,6 +1,6 @@
 {
     "name": "alexoliverwd/basic-router",
-    "description": "A basic router class written in PHP",
+    "description": "A minimalistic yet powerful PHP class designed to handle routing in web applications.",
     "keywords": [
         "handlebars",
         "template",
@@ -10,12 +10,12 @@
     "authors": [
         {
             "name": "Alex Oliver",
-            "homepage": "https://github.com/aoliverwd",
+            "homepage": "https://github.com/aoliverwd/basic-router",
             "role": "Lead"
         }
     ],
     "support": {
-        "issues": "https://github.com/aoliverwd/issues"
+        "issues": "https://github.com/aoliverwd/basic-router/issues"
     },
     "prefer-stable": true,
     "require": {
