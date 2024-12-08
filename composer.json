@@ -2,9 +2,8 @@
     "name": "alexoliverwd/basic-router",
     "description": "A minimalistic yet powerful PHP class designed to handle routing in web applications.",
     "keywords": [
-        "handlebars",
-        "template",
-        "html"
+        "routing",
+        "http"
     ],
     "license": "MIT",
     "authors": [
