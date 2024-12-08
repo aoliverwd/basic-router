@@ -1,0 +1,47 @@
+{
+    "name": "alexoliverwd/basic-router",
+    "description": "A basic router class written in PHP",
+    "keywords": [
+        "handlebars",
+        "template",
+        "html"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Oliver",
+            "homepage": "https://github.com/aoliverwd",
+            "role": "Lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/aoliverwd/issues"
+    },
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.3"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0",
+        "pestphp/pest": "^3.6"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test" : [
+            "./vendor/bin/phpstan analyse -c phpstan.neon",
+            "@unit"
+        ],
+        "unit": [
+            "./vendor/bin/pest"
+        ]
+    }
+}
