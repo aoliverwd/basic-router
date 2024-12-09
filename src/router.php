@@ -30,6 +30,10 @@ class Router
         $this->path = !empty($_SERVER['REQUEST_URI'])
             ? parse_url($_SERVER['REQUEST_URI'])
             : false;
+
+        if (isset($this->path['path'])) {
+            $this->path['path'] = $this->formatRoute($this->path['path']);
+        }
     }
 
     /**
@@ -42,6 +46,7 @@ class Router
     public function register(string $method, string $route, callable $callback): bool
     {
         $method = strtolower($method);
+        $route = $this->formatRoute($route);
 
         if (!$this->checkRoute($method, $route)) {
             $this->methods[$method][$route] = $callback;
@@ -59,6 +64,8 @@ class Router
      */
     public function unregister(string $method, string $route): bool
     {
+        $route = $this->formatRoute($route);
+
         if ($this->checkRoute($method, $route)) {
             unset($this->methods[$method][$route]);
             $result = $this->checkRoute($method, $route);
@@ -86,6 +93,8 @@ class Router
      */
     public function checkRoute(string $method, string $route): callable|bool
     {
+        $route = $this->formatRoute($route);
+
         return isset($this->methods[$method][$route]) && is_callable($this->methods[$method][$route])
             ? $this->methods[$method][$route]
             : false;
@@ -125,6 +134,21 @@ class Router
         }
 
         $this->load404();
+    }
+
+    /**
+     * Format route
+     * @param  string $route
+     * @return string
+     */
+    private function formatRoute(string $route): string
+    {
+        return $route . (
+            strlen($route) > 1
+            && substr($route, -1) !== '/'
+            ? '/'
+            : ''
+        );
     }
 
     /**

@@ -45,6 +45,17 @@ test('Register GET, PUT, POST and DELETE', function () {
     expect($router->checkRoute('delete', '/delete'))->toBeCallable();
 });
 
+test('Endpoint with trailing slash', function () {
+    $router = new Router();
+    $router->register('get', '/get/', fn() => 'foo');
+
+    expect($router->checkRoute('get', '/get'))->toBeCallable();
+
+    $response_get = cURLCall('get', '/test/');
+    expect($response_get['headers']['http_code'])->toBeInt()->ToBe(200);
+    expect($response_get['response'])->toBe('get test');
+});
+
 test('Unregister Route', function () {
     $router = new Router();
     $router->register('get', '/get', fn() => 'foo');
