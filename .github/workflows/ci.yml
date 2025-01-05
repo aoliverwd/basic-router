@@ -1,0 +1,22 @@
+name: Static Analysis and Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: "actions/checkout@v2"
+    - uses: "shivammathur/setup-php@v2"
+      with:
+        php-version: 8.3
+
+    - run: |
+        composer install
+        php -S localhost:50967 -t example/ > /dev/null &
+        composer test

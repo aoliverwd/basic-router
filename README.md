@@ -1,3 +1,5 @@
+![PHPUnit](https://github.com/aoliverwd/basic-router/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/basic-router/v)](//packagist.org/packages/alexoliverwd/basic-router) [![License](https://poser.pugx.org/alexoliverwd/basic-router/license)](//packagist.org/packages/alexoliverwd/basic-router)
+
 # Basic Router
 
 This application is a minimalistic yet powerful PHP class designed to handle routing in web applications. It's a dependency-free solution that offers a straightforward approach to mapping HTTP requests to specific PHP functions or methods.
