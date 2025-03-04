@@ -18,21 +18,14 @@ class Router
      */
     public function __construct()
     {
-        $this->methods = array_map(fn() => [], [
-            'get',
-            'put',
-            'post',
-            'delete'
-        ]);
+        $this->methods = array_map(fn() => [], ["get", "put", "post", "delete"]);
 
         $this->error_page = null;
 
-        $this->path = !empty($_SERVER['REQUEST_URI'])
-            ? parse_url($_SERVER['REQUEST_URI'])
-            : false;
+        $this->path = !empty($_SERVER["REQUEST_URI"]) ? parse_url($_SERVER["REQUEST_URI"]) : false;
 
-        if (isset($this->path['path'])) {
-            $this->path['path'] = $this->formatRoute($this->path['path']);
+        if (isset($this->path["path"])) {
+            $this->path["path"] = $this->formatRoute($this->path["path"]);
         }
     }
 
@@ -106,17 +99,17 @@ class Router
      */
     public function run(): void
     {
-        $route = $this->path['path'] ?? '';
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $callback = '';
+        $route = $this->path["path"] ?? "";
+        $method = strtolower($_SERVER["REQUEST_METHOD"]);
+        $callback = "";
 
         if (isset($this->methods[$method]) && !empty($route)) {
             foreach ($this->methods[$method] as $method_route => $method_callback) {
-                $prepend = substr($method_route, 1) !== '^' ? '^' : '';
-                $append = substr($method_route, -1) !== '$' ? '$' : '';
-                $method_route = str_replace('/', '\/', $method_route);
+                $prepend = substr($method_route, 1) !== "^" ? "^" : "";
+                $append = substr($method_route, -1) !== '$' ? '$' : "";
+                $method_route = str_replace("/", "\/", $method_route);
 
-                if (preg_match('/' . $prepend . $method_route . $append . '/', $route)) {
+                if (preg_match("/" . $prepend . $method_route . $append . "/", $route)) {
                     $callback = $method_callback;
                     break;
                 }
@@ -137,18 +130,35 @@ class Router
     }
 
     /**
+     * Get segment from route
+     * @param  int $segmentID
+     * @return string
+     */
+    public function getSegment(int $segmentID): string
+    {
+        $segments = is_array($this->path) && isset($this->path["path"]) ? explode("/", $this->path["path"]) : [];
+
+        if (empty($segments)) {
+            return "";
+        }
+
+        $segments = array_values(array_filter($segments));
+
+        if ($segmentID < 0) {
+            return $segments[count($segments) - abs($segmentID)];
+        }
+
+        return isset($segments[$segmentID]) ? $segments[$segmentID] : "";
+    }
+
+    /**
      * Format route
      * @param  string $route
      * @return string
      */
     private function formatRoute(string $route): string
     {
-        return $route . (
-            strlen($route) > 1
-            && substr($route, -1) !== '/'
-            ? '/'
-            : ''
-        );
+        return $route . (strlen($route) > 1 && substr($route, -1) !== "/" ? "/" : "");
     }
 
     /**
