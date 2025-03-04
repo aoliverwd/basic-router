@@ -1,9 +1,9 @@
 name: basic-router
 
 services:
-  php:
-    type: php:8.3
-    via: cli
-    webroot: .
-    run:
-      - php -S localhost:50967 -t example/ > /dev/null &
+    php:
+        type: php:8.3
+        via: cli
+        webroot: .
+        run:
+            - php -S localhost:50967 -t example/ > /dev/null
