@@ -145,7 +145,7 @@ class Router
         $segments = array_values(array_filter($segments));
 
         if ($segmentID < 0) {
-            return $segments[count($segments) - abs($segmentID)];
+            return $segments[count($segments) - abs($segmentID)] ?? "";
         }
 
         return isset($segments[$segmentID]) ? $segments[$segmentID] : "";
