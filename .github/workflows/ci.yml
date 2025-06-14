@@ -17,5 +17,6 @@ jobs:
 
             - run: |
                   composer install
-                  php -S localhost:50967 -t ./example/ > /dev/null &
+                  composer dumpautoload
+                  php -S localhost:50967 -t example/ > /dev/null &
                   composer test
