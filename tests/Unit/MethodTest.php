@@ -139,3 +139,15 @@ test("Get second segment", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("segment");
 });
+
+test("GET hello world attribute", function () {
+    $response = cURLCall("get", "/hello-world");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("GET - Hello World");
+});
+
+test("POST hello world attribute", function () {
+    $response = cURLCall("post", "/hello-world");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("POST - Hello World");
+});
