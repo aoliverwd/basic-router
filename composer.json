@@ -36,7 +36,6 @@
     },
     "scripts": {
         "test": [
-            "php -S localhost:50967 -t example/ > /dev/null &",
             "./vendor/bin/phpstan analyse -c phpstan.neon",
             "@unit"
         ],
