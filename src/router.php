@@ -2,6 +2,9 @@
 
 namespace AOWD;
 
+use AOWD\Attributes\Route;
+use ReflectionClass;
+
 class Router
 {
     /** @var array<mixed> */
@@ -12,6 +15,7 @@ class Router
 
     /** @var array<mixed> $path */
     private array|false $path;
+
 
     /**
      * Class constructor
@@ -30,13 +34,36 @@ class Router
     }
 
     /**
+         * Register a controller and its route attributes
+         * @param  object $controller
+         * @return void
+         */
+    public function registerController(object $controller): void
+    {
+        $refClass = new ReflectionClass($controller);
+
+        foreach ($refClass->getMethods() as $method) {
+            foreach ($method->getAttributes(Route::class) as $attr) {
+                $routeAttr = $attr->newInstance();
+                $path = $this->formatRoute($routeAttr->path);
+                $httpMethod = strtoupper($routeAttr->method);
+                $method_name = $method->getName();
+
+                if (!empty($method_name)) {
+                    $this->register($httpMethod, $path, [$controller, $method->getName()]);
+                }
+            }
+        }
+    }
+
+    /**
      * Register new route
      * @param  string   $method
      * @param  string   $route
-     * @param  callable $callback
+     * @param  callable|array<mixed> $callback
      * @return boolean
      */
-    public function register(string $method, string $route, callable $callback): bool
+    public function register(string $method, string $route, callable|array $callback): bool
     {
         $method = strtolower($method);
         $route = $this->formatRoute($route);
