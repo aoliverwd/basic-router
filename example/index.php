@@ -48,6 +48,6 @@ $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
 });
 
-$router->registerController(new myRoutes());
+$router->registerRouteController(new myRoutes());
 
 $router->run();
