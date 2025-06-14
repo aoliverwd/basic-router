@@ -1,8 +1,31 @@
 <?php
 
+namespace AOWD\Example;
+
 use AOWD\Router;
+use AOWD\Attributes\Route;
 
 include_once dirname(__DIR__) . "/vendor/autoload.php";
+
+class myRoutes {
+    #[Route('/hello-world', 'get')]
+    public function homeGet(): void
+    {
+        echo "GET - Hello World";
+    }
+
+    #[Route('/hello-world/segment/[0-9]+', 'get')]
+    public function homeGetSegment(Router $router): void
+    {
+        echo $router->getSegment(1);
+    }
+
+    #[Route('/hello-world', 'post')]
+    public function homePost(): void
+    {
+        echo "POST - Hello World";
+    }
+}
 
 $router = new Router();
 
@@ -30,5 +53,7 @@ $router->register("get", "/last/segment/[0-9]+", function () use ($router) {
 $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
 });
+
+$router->registerRouteController(new myRoutes());
 
 $router->run();

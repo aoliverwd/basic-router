@@ -2,6 +2,9 @@
 
 namespace AOWD;
 
+use AOWD\Attributes\Route;
+use ReflectionClass;
+
 class Router
 {
     /** @var array<mixed> */
@@ -13,15 +16,14 @@ class Router
     /** @var array<mixed> $path */
     private array|false $path;
 
+
     /**
      * Class constructor
      */
     public function __construct()
     {
         $this->methods = array_map(fn() => [], ["get", "put", "post", "delete"]);
-
         $this->error_page = null;
-
         $this->path = !empty($_SERVER["REQUEST_URI"]) ? parse_url($_SERVER["REQUEST_URI"]) : false;
 
         if (isset($this->path["path"])) {
@@ -30,13 +32,36 @@ class Router
     }
 
     /**
+         * Register a controller and its route attributes
+         * @param  object $controller
+         * @return void
+         */
+    public function registerRouteController(object $controller): void
+    {
+        $refClass = new ReflectionClass($controller);
+
+        foreach ($refClass->getMethods() as $method) {
+            foreach ($method->getAttributes(Route::class) as $attr) {
+                $routeAttr = $attr->newInstance();
+                $path = $this->formatRoute($routeAttr->path);
+                $httpMethod = strtoupper($routeAttr->method);
+                $method_name = $method->getName();
+
+                if (!empty($method_name)) {
+                    $this->register($httpMethod, $path, [$controller, $method->getName()]);
+                }
+            }
+        }
+    }
+
+    /**
      * Register new route
      * @param  string   $method
      * @param  string   $route
-     * @param  callable $callback
+     * @param  callable|array<mixed> $callback
      * @return boolean
      */
-    public function register(string $method, string $route, callable $callback): bool
+    public function register(string $method, string $route, callable|array $callback): bool
     {
         $method = strtolower($method);
         $route = $this->formatRoute($route);
@@ -122,7 +147,7 @@ class Router
 
         if (is_callable($callback)) {
             http_response_code(200);
-            $callback();
+            $callback($this);
             exit();
         }
 

@@ -15,6 +15,40 @@ composer require alexoliverwd/basic-router
 ## Basic Usage
 
 When a request comes in to the application, the Router instance will examine the request method (GET, POST, PUT, DELETE) and the requested URL. If a matching route is found, the associated callback function will be executed.
+### Attribute-Based Controller Routing
+
+Attributes provide a modern, native way to declare route metadata directly in your code. This approach is now recommended for defining routes, while conventional methods will remain supported for compatibility.
+
+```php
+use AOWD\Router;
+use AOWD\Attributes\Route;
+
+class myRoutes {
+    #[Route('/hello-world', 'get')]
+    public function homeGet(): void
+    {
+        echo "GET - Hello World";
+    }
+
+    #[Route('/hello-world/segment/[0-9]+', 'get')]
+    public function homeGetSegment(Router $router): void
+    {
+        echo $router->getSegment(1);
+    }
+
+    #[Route('/hello-world', 'post')]
+    public function homePost(): void
+    {
+        echo "POST - Hello World";
+    }
+}
+
+$router = new Router();
+$router->registerRouteController(new myRoutes());
+$router->run();
+```
+
+### Conventional Method
 
 ```php
 use AOWD\Router;
@@ -25,6 +59,10 @@ $router->register('GET', '/', function () {
     echo 'get';
 });
 
+$router->register("get", "/second/segment/[0-9]+", function () use ($router) {
+    echo $router->getSegment(1);
+});
+
 $router->run();
 ```
 
@@ -33,7 +71,6 @@ In this example, if a GET request is made to the root URL (/), the function func
 ### Registering an endpoint
 
 The ```register``` method registers a new route in the routing system.
-
 #### Parameters
 
 1. Method: The HTTP method (e.g., GET, POST, PUT, DELETE).
