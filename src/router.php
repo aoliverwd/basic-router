@@ -147,7 +147,7 @@ class Router
 
         if (is_callable($callback)) {
             http_response_code(200);
-            $callback();
+            $callback($this);
             exit();
         }
 

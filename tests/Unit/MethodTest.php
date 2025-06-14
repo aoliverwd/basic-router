@@ -151,3 +151,10 @@ test("POST hello world attribute", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("POST - Hello World");
 });
+
+
+test("Get second segment via attribute call", function () {
+    $response = cURLCall("get", "/hello-world/segment/123");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("segment");
+});

@@ -14,6 +14,12 @@ class myRoutes {
         echo "GET - Hello World";
     }
 
+    #[Route('/hello-world/segment/[0-9]+', 'get')]
+    public function homeGetSegment(Router $router): void
+    {
+        echo $router->getSegment(1);
+    }
+
     #[Route('/hello-world', 'post')]
     public function homePost(): void
     {
