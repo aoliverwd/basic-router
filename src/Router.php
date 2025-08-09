@@ -22,7 +22,7 @@ class Router
      */
     public function __construct()
     {
-        $this->methods = array_map(fn() => [], ["get", "put", "post", "delete"]);
+        $this->methods = array_map(fn () => [], ["get", "put", "post", "delete"]);
         $this->error_page = null;
         $this->path = !empty($_SERVER["REQUEST_URI"]) ? parse_url($_SERVER["REQUEST_URI"]) : false;
 

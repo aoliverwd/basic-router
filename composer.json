@@ -27,7 +27,8 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^2.0",
-        "pestphp/pest": "^3.6"
+        "pestphp/pest": "^3.6",
+        "laravel/pint": "^1.24"
     },
     "config": {
         "allow-plugins": {
@@ -41,6 +42,9 @@
         ],
         "unit": [
             "./vendor/bin/pest"
+        ],
+        "format": [
+            "./vendor/bin/pint src --preset psr12"
         ]
     }
 }
