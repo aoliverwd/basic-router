@@ -158,3 +158,15 @@ test("Get second segment via attribute call", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("segment");
 });
+
+test("GET hello world attribute with middleware", function () {
+    $response = cURLCall("get", "/hello-world-middleware");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("Hello World GET");
+});
+
+test("GET hello world attribute with multiple middleware", function () {
+    $response = cURLCall("get", "/hello-world-multi-middleware");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("The best Hello World GET");
+});
