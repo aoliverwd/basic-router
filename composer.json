@@ -37,8 +37,12 @@
         }
     },
     "scripts": {
+        "test-local": [
+            "@format",
+            "@test",
+            "@spell"
+        ],
         "test": [
-            "./vendor/bin/pint src --preset psr12",
             "./vendor/bin/phpstan analyse -c phpstan.neon",
             "@unit"
         ],
