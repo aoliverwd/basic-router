@@ -47,6 +47,9 @@
         ],
         "format": [
             "./vendor/bin/pint src --preset psr12"
+        ],
+        "spell": [
+            "./vendor/bin/peck"
         ]
     }
 }
