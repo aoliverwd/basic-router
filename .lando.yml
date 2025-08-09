@@ -5,5 +5,3 @@ services:
         type: php:8.4
         via: cli
         webroot: .
-        run:
-            - php -S localhost:50967 -t example/ > /dev/null
