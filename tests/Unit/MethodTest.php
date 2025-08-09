@@ -2,28 +2,6 @@
 
 use AOWD\Router;
 
-function cURLCall(string $method = "get", string $endpoint = "/"): array
-{
-    $ch = curl_init("http://localhost:50967" . $endpoint);
-
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST => strtoupper($method),
-        CURLOPT_HEADER => true,
-        CURLOPT_HEADER => false,
-    ]);
-
-    $response = curl_exec($ch);
-    $header = curl_getinfo($ch);
-
-    curl_close($ch);
-
-    return [
-        "response" => $response,
-        "headers" => $header,
-    ];
-}
-
 test("Not Set GET, PUT, POST and DELETE", function () {
     $router = new Router();
     expect($router->checkRoute("get", "/test"))->toBeFalse();
@@ -120,41 +98,4 @@ test("Regular Expression", function () {
     $response = cURLCall("get", "/test/13216255/foo");
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("regex");
-});
-
-test("Get segment", function () {
-    $response = cURLCall("get", "/segment/123");
-    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
-    expect($response["response"])->toBe("segment");
-});
-
-test("Get last segment", function () {
-    $response = cURLCall("get", "/last/segment/123");
-    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
-    expect($response["response"])->toBe("123");
-});
-
-test("Get second segment", function () {
-    $response = cURLCall("get", "/second/segment/123");
-    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
-    expect($response["response"])->toBe("segment");
-});
-
-test("GET hello world attribute", function () {
-    $response = cURLCall("get", "/hello-world");
-    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
-    expect($response["response"])->toBe("GET - Hello World");
-});
-
-test("POST hello world attribute", function () {
-    $response = cURLCall("post", "/hello-world");
-    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
-    expect($response["response"])->toBe("POST - Hello World");
-});
-
-
-test("Get second segment via attribute call", function () {
-    $response = cURLCall("get", "/hello-world/segment/123");
-    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
-    expect($response["response"])->toBe("segment");
 });

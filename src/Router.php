@@ -2,6 +2,8 @@
 
 namespace AOWD;
 
+use AOWD\Interfaces\Middleware as MiddlewareInterface;
+use AOWD\Attributes\Middleware;
 use AOWD\Attributes\Route;
 use ReflectionClass;
 
@@ -22,7 +24,7 @@ class Router
      */
     public function __construct()
     {
-        $this->methods = array_map(fn() => [], ["get", "put", "post", "delete"]);
+        $this->methods = array_map(fn () => [], ["get", "put", "post", "delete"]);
         $this->error_page = null;
         $this->path = !empty($_SERVER["REQUEST_URI"]) ? parse_url($_SERVER["REQUEST_URI"]) : false;
 
@@ -32,10 +34,10 @@ class Router
     }
 
     /**
-         * Register a controller and its route attributes
-         * @param  object $controller
-         * @return void
-         */
+     * Register a controller and its route attributes
+     * @param  object $controller
+     * @return void
+     */
     public function registerRouteController(object $controller): void
     {
         $refClass = new ReflectionClass($controller);
@@ -47,8 +49,15 @@ class Router
                 $httpMethod = strtoupper($routeAttr->method);
                 $method_name = $method->getName();
 
+                // Collect middleware for this method
+                $middlewareList = [];
+                foreach ($method->getAttributes(Middleware::class) as $mwAttr) {
+                    $middlewareList[] = $mwAttr->newInstance()->className;
+                }
+
                 if (!empty($method_name)) {
-                    $this->register($httpMethod, $path, [$controller, $method->getName()]);
+                    // Now register the route and attach middleware metadata
+                    $this->register($httpMethod, $path, [$controller, $method->getName()], $middlewareList);
                 }
             }
         }
@@ -59,15 +68,19 @@ class Router
      * @param  string   $method
      * @param  string   $route
      * @param  callable|array<mixed> $callback
+     * @param  array<mixed> $middleware
      * @return boolean
      */
-    public function register(string $method, string $route, callable|array $callback): bool
+    public function register(string $method, string $route, callable|array $callback, array $middleware = []): bool
     {
         $method = strtolower($method);
         $route = $this->formatRoute($route);
 
         if (!$this->checkRoute($method, $route)) {
-            $this->methods[$method][$route] = $callback;
+            $this->methods[$method][$route] = [
+                'handler' => $callback,
+                'middleware' => $middleware
+            ];
             return true;
         }
 
@@ -113,8 +126,9 @@ class Router
     {
         $route = $this->formatRoute($route);
 
-        return isset($this->methods[$method][$route]) && is_callable($this->methods[$method][$route])
-            ? $this->methods[$method][$route]
+        return isset($this->methods[$method][$route]['handler'])
+            && is_callable($this->methods[$method][$route]['handler'])
+            ? $this->methods[$method][$route]['handler']
             : false;
     }
 
@@ -124,30 +138,41 @@ class Router
      */
     public function run(): void
     {
-        $route = $this->path["path"] ?? "";
+        $route = $this->path["path"] ?? false;
         $method = strtolower($_SERVER["REQUEST_METHOD"]);
         $callback = "";
 
-        if (isset($this->methods[$method]) && !empty($route)) {
-            foreach ($this->methods[$method] as $method_route => $method_callback) {
-                $prepend = substr($method_route, 1) !== "^" ? "^" : "";
-                $append = substr($method_route, -1) !== '$' ? '$' : "";
-                $method_route = str_replace("/", "\/", $method_route);
-
-                if (preg_match("/" . $prepend . $method_route . $append . "/", $route)) {
-                    $callback = $method_callback;
-                    break;
-                }
-            }
-        } else {
-            // Method is not supported
+        // Method is not supported
+        if ($route && !isset($this->methods[$method])) {
             http_response_code(501);
             exit();
         }
 
-        if (is_callable($callback)) {
+        foreach ($this->methods[$method] as $method_route => $method_callback) {
+            $prepend = substr($method_route, 1) !== "^" ? "^" : "";
+            $append = substr($method_route, -1) !== '$' ? '$' : "";
+            $method_route = str_replace("/", "\/", $method_route);
+
+            if (preg_match("/" . $prepend . $method_route . $append . "/", $route)) {
+                $callback = $method_callback;
+                break;
+            }
+        }
+
+        // Check if $callback is array
+        if (is_array($callback)) {
+            // Execute middleware
+            foreach ($callback['middleware'] as $mwClass) {
+                if (class_exists($mwClass) && $implements = class_implements($mwClass)) {
+                    if (isset($implements[MiddlewareInterface::class]) && method_exists($mwClass, 'handle')) {
+                        new $mwClass()->handle();
+                    }
+                }
+            }
+
+            // Run route handler
             http_response_code(200);
-            $callback($this);
+            $callback['handler']($this);
             exit();
         }
 

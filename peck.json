@@ -1,0 +1,7 @@
+{
+    "preset": "base",
+    "ignore": {
+        "words": ["php", "unregister"],
+        "paths": []
+    }
+}

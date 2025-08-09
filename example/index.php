@@ -4,10 +4,44 @@ namespace AOWD\Example;
 
 use AOWD\Router;
 use AOWD\Attributes\Route;
+use AOWD\Attributes\Middleware;
+use AOWD\Interfaces\Middleware as MiddlewareInterface;
 
 include_once dirname(__DIR__) . "/vendor/autoload.php";
 
+class theBest implements MiddlewareInterface
+{
+    public function handle(): void
+    {
+        echo "The best ";
+    }
+}
+
+class helloWorld implements MiddlewareInterface
+{
+    public function handle(): void
+    {
+        echo "Hello World ";
+    }
+}
+
+
 class myRoutes {
+    #[Route('/hello-world-middleware', 'get')]
+    #[Middleware(helloWorld::class)]
+    public function homeGetMiddleware(): void
+    {
+        echo "GET";
+    }
+
+    #[Route('/hello-world-multi-middleware', 'get')]
+    #[Middleware(theBest::class)]
+    #[Middleware(helloWorld::class)]
+    public function homeGetMultiMiddleware(): void
+    {
+        echo "GET";
+    }
+
     #[Route('/hello-world', 'get')]
     public function homeGet(): void
     {
