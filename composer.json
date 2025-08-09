@@ -18,7 +18,7 @@
     },
     "prefer-stable": true,
     "require": {
-        "php": ">=8.3"
+        "php": ">=8.4"
     },
     "autoload": {
         "classmap": [
@@ -37,6 +37,7 @@
     },
     "scripts": {
         "test": [
+            "./vendor/bin/pint src --preset psr12",
             "./vendor/bin/phpstan analyse -c phpstan.neon",
             "@unit"
         ],

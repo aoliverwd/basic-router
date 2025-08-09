@@ -2,7 +2,7 @@ name: basic-router
 
 services:
     php:
-        type: php:8.3
+        type: php:8.4
         via: cli
         webroot: .
         run:
