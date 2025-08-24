@@ -49,6 +49,41 @@ $router->registerRouteController(new myRoutes());
 $router->run();
 ```
 
+### Registering Multiple Controllers
+
+In the below example, multiple controllers can be registered with the router in a single call using the `registerRouteController()` method. Each controller class defines its own set of routes through PHP attributes, the router will automatically scan and map them.
+
+```php
+use AOWD\Router;
+use AOWD\Attributes\Route;
+
+class getRoutes {
+    #[Route('/hello-world', 'get')]
+    public function homeGet(): void
+    {
+        echo "GET - Hello World";
+    }
+
+    #[Route('/hello-world/segment/[0-9]+', 'get')]
+    public function homeGetSegment(Router $router): void
+    {
+        echo $router->getSegment(1);
+    }
+}
+
+class postRoutes {
+    #[Route('/hello-world', 'post')]
+    public function homePost(): void
+    {
+        echo "POST - Hello World";
+    }
+}
+
+$router = new Router();
+$router->registerRouteController(new getRoutes(), new postRoutes());
+$router->run();
+```
+
 ### Conventional Method
 
 ```php

@@ -26,7 +26,7 @@ class helloWorld implements MiddlewareInterface
 }
 
 
-class myRoutes {
+class getRoutes {
     #[Route('/hello-world-middleware', 'get')]
     #[Middleware(helloWorld::class)]
     public function homeGetMiddleware(): void
@@ -53,7 +53,9 @@ class myRoutes {
     {
         echo $router->getSegment(1);
     }
+}
 
+class postRoutes {
     #[Route('/hello-world', 'post')]
     public function homePost(): void
     {
@@ -88,6 +90,5 @@ $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
 });
 
-$router->registerRouteController(new myRoutes());
-
+$router->registerRouteController(new getRoutes(), new postRoutes());
 $router->run();
