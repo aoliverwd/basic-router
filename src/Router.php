@@ -35,29 +35,33 @@ class Router
 
     /**
      * Register a controller and its route attributes
-     * @param  object $controller
+     * @param  object $controllers
      * @return void
      */
-    public function registerRouteController(object $controller): void
+    public function registerRouteController(...$controllers): void
     {
-        $refClass = new ReflectionClass($controller);
+        foreach ($controllers as $controller) {
+            if (class_exists($controller::class)) {
+                $refClass = new ReflectionClass($controller);
 
-        foreach ($refClass->getMethods() as $method) {
-            foreach ($method->getAttributes(Route::class) as $attr) {
-                $routeAttr = $attr->newInstance();
-                $path = $this->formatRoute($routeAttr->path);
-                $httpMethod = strtoupper($routeAttr->method);
-                $method_name = $method->getName();
+                foreach ($refClass->getMethods() as $method) {
+                    foreach ($method->getAttributes(Route::class) as $attr) {
+                        $routeAttr = $attr->newInstance();
+                        $path = $this->formatRoute($routeAttr->path);
+                        $httpMethod = strtoupper($routeAttr->method);
+                        $method_name = $method->getName();
 
-                // Collect middleware for this method
-                $middlewareList = [];
-                foreach ($method->getAttributes(Middleware::class) as $mwAttr) {
-                    $middlewareList[] = $mwAttr->newInstance()->className;
-                }
+                        // Collect middleware for this method
+                        $middlewareList = [];
+                        foreach ($method->getAttributes(Middleware::class) as $mwAttr) {
+                            $middlewareList[] = $mwAttr->newInstance()->className;
+                        }
 
-                if (!empty($method_name)) {
-                    // Now register the route and attach middleware metadata
-                    $this->register($httpMethod, $path, [$controller, $method->getName()], $middlewareList);
+                        if (!empty($method_name)) {
+                            // Now register the route and attach middleware metadata
+                            $this->register($httpMethod, $path, [$controller, $method->getName()], $middlewareList);
+                        }
+                    }
                 }
             }
         }
