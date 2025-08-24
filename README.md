@@ -129,11 +129,9 @@ The `register404` method registers a callback function to be executed when a 404
 
 # Middleware
 
-Middleware in this routing API provides a way to intercept and process requests before (or after) they reach your route handler.
-This allows you to implement reusable logic such as **authentication, logging, CORS handling, rate limiting, or response modification** without duplicating code inside your route controllers.
+Middleware in this routing API provides a way to intercept and process requests before they reach your route handler. This allows you to implement reusable logic such as **authentication, logging, CORS handling, rate limiting, or response modification** without duplicating code inside your route controllers.
 
-Middleware classes must implement the `AOWD\Interfaces\Middleware` interface, which requires a `handle()` method.
-When a route is matched, any attached middleware will be executed in the order they are defined.
+Middleware classes must implement the `AOWD\Interfaces\Middleware` interface, which requires a `handle()` method. When a route is matched, any attached middleware will be executed in the order they are defined.
 
 ## Usage
 
