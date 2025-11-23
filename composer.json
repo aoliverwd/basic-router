@@ -39,8 +39,8 @@
     "scripts": {
         "test-local": [
             "@format",
-            "@test",
-            "@spell"
+            "@spell",
+            "@test"
         ],
         "test": [
             "./vendor/bin/phpstan analyse -c phpstan.neon",
