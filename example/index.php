@@ -57,8 +57,9 @@ class getRoutes {
     #[Route('/users/{userId}/orders/{orderId}', 'get')]
     public function URLAttributesTest(Router $router): void
     {
-        echo "User: " . $router->URLAttribute("userId")
-        ." Order: " . $router->URLAttribute("orderId");
+        $user_id = $router->URLAttribute("userId");
+        $order_id = $router->URLAttribute("orderId");
+        echo "User: $user_id Order: $order_id";
     }
 
     #[Route('/users/{user_Id}', 'get')]
@@ -101,6 +102,12 @@ $router->register("get", "/last/segment/[0-9]+", function () use ($router) {
 
 $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
+});
+
+$router->register("get", "/books/{author}/{book_id}", function () use ($router) {
+    $book_author = $router->URLAttribute("author");
+    $book_id = $router->URLAttribute("book_id");
+    echo "Author: $book_author ID: $book_id";
 });
 
 $router->registerRouteController(new getRoutes(), new postRoutes());

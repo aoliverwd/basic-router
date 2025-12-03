@@ -13,3 +13,9 @@ test("User attribute ID fallback", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("User: foo");
 });
+
+test("Register via method", function () {
+    $response = cURLCall("get", "/books/jane-doe/223658");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("Author: jane-doe ID: 223658");
+});
