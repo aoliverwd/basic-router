@@ -2,7 +2,7 @@
 
 # Router
 
-This application is a minimalistic yet powerful PHP class designed to handle routing in web applications. It's a dependency-free solution that offers a straightforward approach to mapping HTTP requests to specific PHP functions or methods.
+This application is a minimalistic yet powerful PHP class designed to handle routing in web applications. It's a dependency-free solution that offers a straightforward approach to mapping HTTP requests to functions or methods, with full support for registering routes and middleware using PHP Attributes.
 
 ## Installation
 
@@ -187,6 +187,9 @@ public function URLAttributesTest(Router $router): void
 
 1. **Reference ID _(string)_** — The name of the URL attribute to retrieve (e.g., `userId`).
 2. **Fallback _(string|int, optional)_** — A value to return if the requested attribute is not found.
+
+> [!NOTE]
+> Attribute names may only contain alphabetic characters (A–Z, a–z), hyphens, and underscores (i.e., a-z, A-Z, -, \_).
 
 ---
 
