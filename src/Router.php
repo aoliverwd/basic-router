@@ -18,6 +18,11 @@ class Router
     /** @var array<mixed> $path */
     private array|false $path;
 
+    /** @var array<string, array<string, string|int>> $url_attributes */
+    private array $url_attributes = [];
+
+    /** @var array<string, string|int> $url_attribute_data */
+    private array $url_attribute_data;
 
     /**
      * Class constructor
@@ -36,7 +41,6 @@ class Router
     /**
      * Register a controller and its route attributes
      * @param  object $controllers
-     * @return void
      */
     public function registerRouteController(...$controllers): void
     {
@@ -69,11 +73,8 @@ class Router
 
     /**
      * Register new route
-     * @param  string   $method
-     * @param  string   $route
      * @param  callable|array<mixed> $callback
      * @param  array<mixed> $middleware
-     * @return boolean
      */
     public function register(string $method, string $route, callable|array $callback, array $middleware = []): bool
     {
@@ -93,9 +94,6 @@ class Router
 
     /**
      * Unregister route
-     * @param  string $method
-     * @param  string $route
-     * @return boolean
      */
     public function unregister(string $method, string $route): bool
     {
@@ -112,8 +110,6 @@ class Router
 
     /**
      * Register 404 callback
-     * @param  callable $callback
-     * @return void
      */
     public function register404(callable $callback): void
     {
@@ -122,9 +118,6 @@ class Router
 
     /**
      * Check route exists in method
-     * @param  string $method
-     * @param  string $route
-     * @return callable|boolean
      */
     public function checkRoute(string $method, string $route): callable|bool
     {
@@ -138,7 +131,6 @@ class Router
 
     /**
      * Run methods
-     * @return void
      */
     public function run(): void
     {
@@ -155,9 +147,16 @@ class Router
         foreach ($this->methods[$method] as $method_route => $method_callback) {
             $prepend = substr($method_route, 1) !== "^" ? "^" : "";
             $append = substr($method_route, -1) !== '$' ? '$' : "";
-            $method_route = str_replace("/", "\/", $method_route);
+            $new_method_route = str_replace("/", "\/", $method_route);
 
-            if (preg_match("/" . $prepend . $method_route . $append . "/", $route)) {
+            if (preg_match("/" . $prepend . $new_method_route . $append . "/", $route, $matches)) {
+                // Check URL attributes
+                if (isset($this->url_attributes[$method_route])) {
+                    array_shift($matches);
+                    $matches = array_values($matches);
+                    $this->url_attribute_data = array_map(fn ($key) => $matches[$key] ?? "", $this->url_attributes[$method_route]);
+                }
+
                 $callback = $method_callback;
                 break;
             }
@@ -185,8 +184,6 @@ class Router
 
     /**
      * Get segment from route
-     * @param  int $segmentID
-     * @return string
      */
     public function getSegment(int $segmentID): string
     {
@@ -206,18 +203,39 @@ class Router
     }
 
     /**
-     * Format route
-     * @param  string $route
-     * @return string
+     * Format route URL
      */
     private function formatRoute(string $route): string
     {
-        return $route . (strlen($route) > 1 && substr($route, -1) !== "/" ? "/" : "");
+        $append_slash = (strlen($route) > 1 && substr($route, -1) !== "/" ? "/" : "");
+        return $this->registerURLAttributes($route . $append_slash);
+    }
+
+    /**
+     * Register URL attributes I.E /users/{userId}/orders/{orderId}
+     */
+    private function registerURLAttributes(string $route): string
+    {
+        $match = '\{([a-zA-Z-_]+)\}';
+        if (preg_match_all('/' . $match . '/', $route, $matches)) {
+            $ref_url = preg_replace('/' . $match . '/', '(\S*?)', $route);
+            $this->url_attributes[$ref_url] = array_flip($matches[1]);
+            return $ref_url ?: "";
+        }
+
+        return $route;
+    }
+
+    /**
+     * Return URL attribute
+     */
+    public function URLAttribute(string $attribute_name, string|int $fallback = ""): string|int
+    {
+        return $this->url_attribute_data[$attribute_name] ?? $fallback;
     }
 
     /**
      * Load 404 page
-     * @return void
      */
     private function load404(): void
     {

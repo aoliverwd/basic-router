@@ -1,6 +1,6 @@
 ![PHPUnit](https://github.com/aoliverwd/basic-router/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/basic-router/v)](//packagist.org/packages/alexoliverwd/basic-router) [![License](https://poser.pugx.org/alexoliverwd/basic-router/license)](//packagist.org/packages/alexoliverwd/basic-router)
 
-# Basic Router
+# Router
 
 This application is a minimalistic yet powerful PHP class designed to handle routing in web applications. It's a dependency-free solution that offers a straightforward approach to mapping HTTP requests to specific PHP functions or methods.
 
@@ -12,7 +12,7 @@ Preferred installation is via Composer:
 composer require alexoliverwd/basic-router
 ```
 
-## Basic Usage
+## Usage
 
 When a request comes in to the application, the Router instance will examine the request method (GET, POST, PUT, DELETE) and the requested URL. If a matching route is found, the associated callback function will be executed.
 
@@ -41,6 +41,14 @@ class myRoutes {
     public function homePost(): void
     {
         echo "POST - Hello World";
+    }
+
+    #[Route('/users/{userId}/orders/{orderId}', 'get')]
+    public function getUserOrder(Router $router): void
+    {
+        $user_id = $router->URLAttribute("userId");
+        $order_id = $router->URLAttribute("orderId");
+        echo "User: $user_id Order: $order_id";
     }
 }
 
@@ -110,9 +118,9 @@ The `register` method registers a new route in the routing system.
 
 #### Parameters
 
-1. Method: The HTTP method (e.g., GET, POST, PUT, DELETE).
-2. Route: The URL pattern for the route.
-3. Callback: The callable function or method to be executed when the route is matched.
+1. **Method:** The HTTP method (e.g., GET, POST, PUT, DELETE).
+2. **Route:** The URL pattern for the route.
+3. **Callback:** The callable function or method to be executed when the route is matched.
 
 #### Return Value:
 
@@ -138,8 +146,8 @@ This method unregisters a previously registered route from the routing system.
 
 #### Parameters
 
-1. Method: The HTTP method (e.g., GET, POST, PUT, DELETE) in lowercase.
-2. Route: The URL pattern of the route to be unregistered.
+1. **Method:** The HTTP method (e.g., GET, POST, PUT, DELETE) in lowercase.
+2. **Route:** The URL pattern of the route to be unregistered.
 
 #### Return Value:
 
@@ -158,7 +166,27 @@ The `register404` method registers a callback function to be executed when a 404
 
 #### Parameters
 
-1. Callback: A callable function or method that will be invoked when a 404 error is encountered. This callback can be used to generate custom error messages, redirect to a specific page, or perform other error handling actions.
+1. **Callback:** A callable function or method that will be invoked when a 404 error is encountered. This callback can be used to generate custom error messages, redirect to a specific page, or perform other error handling actions.
+
+### Return from URL attributes
+
+When defining a route that includes attribute placeholders (e.g.,
+`/users/{userId}/orders/{orderId}`), you can easily retrieve those values by using the URLAttribute method.
+
+```php
+#[Route('/users/{userId}/orders/{orderId}', 'get')]
+public function URLAttributesTest(Router $router): void
+{
+    $user_id = $router->URLAttribute("userId");
+    $order_id = $router->URLAttribute("orderId");
+    echo "User: $user_id Order: $order_id";
+}
+```
+
+#### Parameters
+
+1. **Reference ID _(string)_** — The name of the URL attribute to retrieve (e.g., `userId`).
+2. **Fallback _(string|int, optional)_** — A value to return if the requested attribute is not found.
 
 ---
 
