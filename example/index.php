@@ -48,10 +48,23 @@ class getRoutes {
         echo "GET - Hello World";
     }
 
-    #[Route('/hello-world/segment/[0-9]+', 'get')]
+    #[Route('/hello-world/segment/[0-9]*', 'get')]
     public function homeGetSegment(Router $router): void
     {
         echo $router->getSegment(1);
+    }
+
+    #[Route('/users/{userId}/orders/{orderId}', 'get')]
+    public function URLAttributesTest(Router $router): void
+    {
+        echo "User: " . $router->URLAttribute("userId")
+        ." Order: " . $router->URLAttribute("orderId");
+    }
+
+    #[Route('/users/{user_Id}', 'get')]
+    public function URLAttributeFallbackTest(Router $router): void
+    {
+        echo "User: " . $router->URLAttribute("userId", "foo");
     }
 }
 
