@@ -23,6 +23,10 @@ Attributes provide a modern, native way to declare route metadata directly in yo
 ```php
 use AOWD\Router;
 use AOWD\Attributes\Route;
+use AOWD\Attributes\GET;
+use AOWD\Attributes\PUT;
+use AOWD\Attributes\POST;
+use AOWD\Attributes\DELETE;
 
 class myRoutes {
     #[Route('/hello-world', 'get')]
@@ -49,6 +53,32 @@ class myRoutes {
         $user_id = $router->URLAttribute("userId");
         $order_id = $router->URLAttribute("orderId");
         echo "User: $user_id Order: $order_id";
+    }
+    
+    // CRUD Attributes
+
+    #[GET('/crud-hello-world')]
+    public function crudHomeGet(): void
+    {
+        echo "CRUD GET - Hello World";
+    }
+
+    #[PUT('/crud-hello-world')]
+    public function crudHomePut(): void
+    {
+        echo "CRUD PUT - Hello World";
+    }
+
+    #[POST('/crud-hello-world')]
+    public function crudHomePost(): void
+    {
+        echo "CRUD POST - Hello World";
+    }
+
+    #[DELETE('/crud-hello-world')]
+    public function crudHomeDelete(): void
+    {
+        echo "CRUD DELETE - Hello World";
     }
 }
 
@@ -105,6 +135,24 @@ $router->register('GET', '/', function () {
 
 $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
+});
+
+// CRUD Helper Methods
+
+$router->get('/', function () {
+    echo 'get';
+});
+
+$router->put('/', function () {
+    echo 'put';
+});
+
+$router->post('/', function () {
+    echo 'post';
+});
+
+$router->delete('/', function () {
+    echo 'delete';
 });
 
 $router->run();
@@ -197,7 +245,7 @@ public function URLAttributesTest(Router $router): void
 
 Middleware in this routing API provides a way to intercept and process requests before they reach your route handler. This allows you to implement reusable logic such as **authentication, logging, CORS handling, rate limiting, or response modification** without duplicating code inside your route controllers.
 
-Middleware classes must implement the `AOWD\Interfaces\Middleware` interface, which requires a `handle()` method. When a route is matched, any attached middleware will be executed in the order they are defined.
+Middleware classes must implement or extend the `AOWD\Interfaces\Middleware` interface, which requires a `handle()` method. When a route is matched, any attached middleware will be executed in the order they are defined.
 
 ## Usage
 
