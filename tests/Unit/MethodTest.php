@@ -17,10 +17,20 @@ test("Register GET, PUT, POST and DELETE", function () {
     $router->register("post", "/post", fn() => "foo");
     $router->register("delete", "/delete", fn() => "foo");
 
+    $router->get("/crud-get", fn() => fn() => "foo");
+    $router->put("/crud-put", fn() => fn() => "foo");
+    $router->post("/crud-post", fn() => fn() => "foo");
+    $router->delete("/crud-delete", fn() => fn() => "foo");
+
     expect($router->checkRoute("get", "/get"))->toBeCallable();
     expect($router->checkRoute("put", "/put"))->toBeCallable();
     expect($router->checkRoute("post", "/post"))->toBeCallable();
     expect($router->checkRoute("delete", "/delete"))->toBeCallable();
+
+    expect($router->checkRoute("get", "/crud-get"))->toBeCallable();
+    expect($router->checkRoute("put", "/crud-put"))->toBeCallable();
+    expect($router->checkRoute("post", "/crud-post"))->toBeCallable();
+    expect($router->checkRoute("delete", "/crud-delete"))->toBeCallable();
 });
 
 test("Endpoint with trailing slash", function () {
