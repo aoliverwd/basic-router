@@ -5,9 +5,15 @@ namespace AOWD;
 use AOWD\Interfaces\Middleware as MiddlewareInterface;
 use AOWD\Attributes\Middleware;
 use AOWD\Attributes\Route;
+use AOWD\Attributes\DELETE;
+use AOWD\Attributes\POST;
+use AOWD\Attributes\GET;
+use AOWD\Attributes\PUT;
 use ReflectionClass;
+use ReflectionMethod;
+use ReflectionAttribute;
 
-class Router
+final class Router
 {
     /** @var array<mixed> */
     private array $methods;
@@ -49,21 +55,23 @@ class Router
                 $refClass = new ReflectionClass($controller);
 
                 foreach ($refClass->getMethods() as $method) {
-                    foreach ($method->getAttributes(Route::class) as $attr) {
-                        $routeAttr = $attr->newInstance();
-                        $path = $this->formatRoute($routeAttr->path);
-                        $httpMethod = strtoupper($routeAttr->method);
-                        $method_name = $method->getName();
+                    foreach ($this->reflectionClassAttributes($method) as $attr) {
+                        if ($attr instanceof ReflectionAttribute) {
+                            $routeAttr = $attr->newInstance();
+                            $path = $this->formatRoute($routeAttr->path ?? "");
+                            $httpMethod = strtoupper($routeAttr->method ?? "");
+                            $method_name = $method->getName();
 
-                        // Collect middleware for this method
-                        $middlewareList = [];
-                        foreach ($method->getAttributes(Middleware::class) as $mwAttr) {
-                            $middlewareList[] = $mwAttr->newInstance()->className;
-                        }
+                            // Collect middleware for this method
+                            $middlewareList = [];
+                            foreach ($method->getAttributes(Middleware::class) as $mwAttr) {
+                                $middlewareList[] = $mwAttr->newInstance()->className;
+                            }
 
-                        if (!empty($method_name)) {
-                            // Now register the route and attach middleware metadata
-                            $this->register($httpMethod, $path, [$controller, $method->getName()], $middlewareList);
+                            if (!empty($method_name)) {
+                                // Now register the route and attach middleware metadata
+                                $this->register($httpMethod, $path, [$controller, $method->getName()], $middlewareList);
+                            }
                         }
                     }
                 }
@@ -72,7 +80,33 @@ class Router
     }
 
     /**
+     * Return class attributes from reflection method
+     * @param  ReflectionMethod $method
+     * @return array<int, ReflectionAttribute<DELETE|GET|POST|PUT|Route>>|array<null>
+     */
+    private function reflectionClassAttributes(ReflectionMethod $method): array
+    {
+        $attribute_classes = [
+            Route::class,
+            GET::class,
+            PUT::class,
+            POST::class,
+            DELETE::class,
+        ];
+
+        foreach ($attribute_classes as $class) {
+            $methods = $method->getAttributes($class);
+            if ($methods) {
+                return $methods;
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * Register new route
+     * @param  string $method http method
      * @param  callable|array<mixed> $callback
      * @param  array<mixed> $middleware
      */
@@ -90,6 +124,46 @@ class Router
         }
 
         return false;
+    }
+
+    /**
+     * Register get request helper method
+     * @param  callable|array<mixed> $callback
+     * @param  array<mixed> $middleware
+     */
+    public function get(string $route, callable|array $callback, array $middleware = []): void
+    {
+        $this->register('get', $route, $callback, $middleware);
+    }
+
+    /**
+     * Register get request helper method
+     * @param  callable|array<mixed> $callback
+     * @param  array<mixed> $middleware
+     */
+    public function put(string $route, callable|array $callback, array $middleware = []): void
+    {
+        $this->register('put', $route, $callback, $middleware);
+    }
+
+    /**
+     * Register get request helper method
+     * @param  callable|array<mixed> $callback
+     * @param  array<mixed> $middleware
+     */
+    public function post(string $route, callable|array $callback, array $middleware = []): void
+    {
+        $this->register('post', $route, $callback, $middleware);
+    }
+
+    /**
+     * Register get request helper method
+     * @param  callable|array<mixed> $callback
+     * @param  array<mixed> $middleware
+     */
+    public function delete(string $route, callable|array $callback, array $middleware = []): void
+    {
+        $this->register('delete', $route, $callback, $middleware);
     }
 
     /**

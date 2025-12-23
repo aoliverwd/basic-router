@@ -4,6 +4,10 @@ namespace AOWD\Example;
 
 use AOWD\Router;
 use AOWD\Attributes\Route;
+use AOWD\Attributes\GET;
+use AOWD\Attributes\PUT;
+use AOWD\Attributes\POST;
+use AOWD\Attributes\DELETE;
 use AOWD\Attributes\Middleware;
 use AOWD\Interfaces\Middleware as MiddlewareInterface;
 
@@ -77,6 +81,32 @@ class postRoutes {
     }
 }
 
+class crudRoutes {
+    #[GET('/crud-hello-world')]
+    public function homeCrudGET(): void
+    {
+        echo "CRUD GET - Hello World";
+    }
+
+    #[PUT('/crud-hello-world')]
+    public function homeCrudPUT(): void
+    {
+        echo "CRUD PUT - Hello World";
+    }
+
+    #[POST('/crud-hello-world')]
+    public function homeCrudPOST(): void
+    {
+        echo "CRUD POST - Hello World";
+    }
+
+    #[DELETE('/crud-hello-world')]
+    public function homeCrudDELETE(): void
+    {
+        echo "CRUD DELETE - Hello World";
+    }
+}
+
 $router = new Router();
 
 function echoMessage(string $message): void
@@ -91,6 +121,11 @@ $router->register("post", "/test", fn() => echoMessage("post test"));
 $router->register("delete", "/test", fn() => echoMessage("delete test"));
 $router->register("get", "/querystring", fn() => echoMessage($_GET["foo"] ?? ""));
 $router->register("get", "/test/[0-9]+/foo", fn() => echoMessage("regex"));
+
+$router->get("/crud-test", fn() => echoMessage("crud get test"));
+$router->put("/crud-test", fn() => echoMessage("crud put test"));
+$router->post("/crud-test", fn() => echoMessage("crud post test"));
+$router->delete("/crud-test", fn() => echoMessage("crud delete test"));
 
 $router->register("get", "/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(0);
@@ -110,5 +145,5 @@ $router->register("get", "/books/{author}/{book_id}", function () use ($router) 
     echo "Author: $book_author ID: $book_id";
 });
 
-$router->registerRouteController(new getRoutes(), new postRoutes());
+$router->registerRouteController(new getRoutes(), new postRoutes(), new crudRoutes());
 $router->run();
