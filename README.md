@@ -87,6 +87,43 @@ $router->registerRouteController(new myRoutes());
 $router->run();
 ```
 
+### Route Interface
+
+Classes that implement the route interface have access to the ```prepend_path``` variable. This variable allows all routes registered within the class to be automatically prefixed with a common path.
+
+This is useful when all routes in a class must follow a shared convention, such as starting with ```/api/```. If the convention needs to change in the future, it can be updated in one place at the top level rather than modifying every individual route definition within the class.
+
+```php
+use AOWD\Interfaces\Route as RouteInterface;
+use AOWD\Attributes\Route;
+use AOWD\Attributes\GET;
+use AOWD\Router;
+
+class routeWithPrependedSlug implements RouteInterface
+{
+    public string $prepend_path;
+    public function __construct() {
+        $this->prepend_path = $_ENV['PAGE_WITH_SLUG'];
+    }
+
+    #[Route('-env', 'get')]
+    public function pageWithEnv(): void
+    {
+        echo "Page with ENV";
+    }
+
+    #[GET('-crud-hello-world')]
+    public function homeCrudGET(): void
+    {
+        echo "CRUD GET - Hello World";
+    }
+}
+
+$router = new Router();
+$router->registerRouteController(new routeWithPrependedSlug());
+$router->run();
+```
+
 ### Registering Multiple Controllers
 
 In the below example, multiple controllers can be registered with the router in a single call using the `registerRouteController()` method. Each controller class defines its own set of routes through PHP attributes, the router will automatically scan and map them.

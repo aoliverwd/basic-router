@@ -9,9 +9,12 @@ use AOWD\Attributes\PUT;
 use AOWD\Attributes\POST;
 use AOWD\Attributes\DELETE;
 use AOWD\Attributes\Middleware;
+use AOWD\Interfaces\Route as RouteInterface;
 use AOWD\Interfaces\Middleware as MiddlewareInterface;
 
 include_once dirname(__DIR__) . "/vendor/autoload.php";
+
+$_ENV['PAGE_WITH_SLUG'] = "/page-with";
 
 class theBest implements MiddlewareInterface
 {
@@ -29,6 +32,25 @@ class helloWorld implements MiddlewareInterface
     }
 }
 
+class routeWithPrependedSlug implements RouteInterface
+{
+    public string $prepend_path;
+    public function __construct() {
+        $this->prepend_path = $_ENV['PAGE_WITH_SLUG'];
+    }
+
+    #[Route('-env', 'get')]
+    public function pageWithEnv(): void
+    {
+        echo "Page with ENV";
+    }
+
+    #[GET('-crud-hello-world')]
+    public function homeCrudGET(): void
+    {
+        echo "CRUD GET - Hello World";
+    }
+}
 
 class getRoutes {
     #[Route('/hello-world-middleware', 'get')]
@@ -145,5 +167,11 @@ $router->register("get", "/books/{author}/{book_id}", function () use ($router) 
     echo "Author: $book_author ID: $book_id";
 });
 
-$router->registerRouteController(new getRoutes(), new postRoutes(), new crudRoutes());
+$router->registerRouteController(
+    new routeWithPrependedSlug(),
+    new getRoutes(),
+    new postRoutes(),
+    new crudRoutes()
+);
+
 $router->run();

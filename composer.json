@@ -3,7 +3,8 @@
     "description": "A minimalistic yet powerful PHP class designed to handle routing in web applications.",
     "keywords": [
         "routing",
-        "http"
+        "http",
+        "CRUD"
     ],
     "license": "MIT",
     "authors": [

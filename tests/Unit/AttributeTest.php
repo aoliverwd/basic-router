@@ -32,3 +32,9 @@ test("GET hello world attribute with multiple middleware", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("The best Hello World GET");
 });
+
+test("GET page with route interface", function () {
+    $response = cURLCall("get", "/page-with-env");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("Page with ENV");
+});
