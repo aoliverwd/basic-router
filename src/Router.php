@@ -13,7 +13,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionAttribute;
 
-class Router
+final class Router
 {
     /** @var array<mixed> */
     private array $methods;
