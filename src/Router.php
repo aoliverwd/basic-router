@@ -3,6 +3,7 @@
 namespace AOWD;
 
 use AOWD\Interfaces\Middleware as MiddlewareInterface;
+use AOWD\Interfaces\Route as RouteInterface;
 use AOWD\Attributes\Middleware;
 use AOWD\Attributes\Route;
 use AOWD\Attributes\DELETE;
@@ -54,11 +55,15 @@ final class Router
             if (class_exists($controller::class)) {
                 $refClass = new ReflectionClass($controller);
 
+                $prepend_path = $controller instanceof RouteInterface
+                    ? $controller->prepend_path
+                    : "";
+
                 foreach ($refClass->getMethods() as $method) {
                     foreach ($this->reflectionClassAttributes($method) as $attr) {
                         if ($attr instanceof ReflectionAttribute) {
                             $routeAttr = $attr->newInstance();
-                            $path = $this->formatRoute($routeAttr->path ?? "");
+                            $path = $this->formatRoute($prepend_path . ($routeAttr->path ?? ""));
                             $httpMethod = strtoupper($routeAttr->method ?? "");
                             $method_name = $method->getName();
 
@@ -293,8 +298,10 @@ final class Router
         $match = '\{([a-zA-Z-_]+)\}';
         if (preg_match_all('/' . $match . '/', $route, $matches)) {
             $ref_url = preg_replace('/' . $match . '/', '(\S*?)', $route);
-            $this->url_attributes[$ref_url] = array_flip($matches[1]);
-            return $ref_url ?: "";
+            if (!empty($ref_url)) {
+                $this->url_attributes[$ref_url] = array_flip($matches[1]);
+                return $ref_url;
+            }
         }
 
         return $route;
