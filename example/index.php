@@ -44,6 +44,12 @@ class routeWithPrependedSlug implements RouteInterface
     {
         echo "Page with ENV";
     }
+
+    #[GET('-crud-hello-world')]
+    public function homeCrudGET(): void
+    {
+        echo "CRUD GET - Hello World";
+    }
 }
 
 class getRoutes {

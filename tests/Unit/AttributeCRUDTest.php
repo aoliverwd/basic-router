@@ -25,3 +25,9 @@ test("CRUD - DELETE hello world attribute", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("CRUD DELETE - Hello World");
 });
+
+test("CRUD - GET page with route interface", function () {
+    $response = cURLCall("get", "/page-with-crud-hello-world");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("CRUD GET - Hello World");
+});
