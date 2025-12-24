@@ -23,7 +23,7 @@ final class Router
     private mixed $error_page;
 
     /** @var array<mixed> $path */
-    private array|false $path;
+    public array|false $path;
 
     /** @var array<string, array<string, string|int>> $url_attributes */
     private array $url_attributes = [];
@@ -38,10 +38,21 @@ final class Router
     {
         $this->methods = array_map(fn () => [], ["get", "put", "post", "delete"]);
         $this->error_page = null;
-        $this->path = !empty($_SERVER["REQUEST_URI"]) ? parse_url($_SERVER["REQUEST_URI"]) : false;
+        $this->path = !empty($_SERVER["REQUEST_URI"])
+            ? parse_url($_SERVER["REQUEST_URI"])
+            : false;
 
+        // Sanitize path
         if (isset($this->path["path"])) {
-            $this->path["path"] = $this->formatRoute($this->path["path"]);
+            $this->path["path"] = $this->formatRoute(htmlentities($this->path["path"], ENT_QUOTES, 'UTF-8'));
+        }
+
+        // Sanitize query parameters
+        if (isset($this->path["query"])) {
+            parse_str($this->path["query"], $this->path["query"]);
+            $this->path["query"] = array_map(function ($value) {
+                return is_scalar($value) ? htmlentities($value, ENT_QUOTES, 'UTF-8') : "";
+            }, $this->path["query"]);
         }
     }
 
@@ -313,6 +324,14 @@ final class Router
     public function URLAttribute(string $attribute_name, string|int $fallback = ""): string|int
     {
         return $this->url_attribute_data[$attribute_name] ?? $fallback;
+    }
+
+    /**
+     * Returns a sanitized value for the specified query-string parameter ($_GET['q'])
+     */
+    public function getParameter(string $parameter): string|int
+    {
+        return $this->path["query"][$parameter] ?? "";
     }
 
     /**
