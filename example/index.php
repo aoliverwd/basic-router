@@ -161,6 +161,10 @@ $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
 });
 
+$router->register("get", "/xss", function () use ($router) {
+    echo $router->getParameter('q');
+});
+
 $router->register("get", "/books/{author}/{book_id}", function () use ($router) {
     $book_author = $router->URLAttribute("author");
     $book_id = $router->URLAttribute("book_id");

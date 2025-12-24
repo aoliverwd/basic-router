@@ -4,6 +4,10 @@
 
 This application is a minimalistic yet powerful PHP class designed to handle routing in web applications. It's a dependency-free solution that offers a straightforward approach to mapping HTTP requests to functions or methods, with full support for registering routes and middleware using PHP Attributes.
 
+> [!IMPORTANT]
+> To prevent XSS attacks, use the built-in `getParameter` method when retrieving values from query parameters. 
+> 
+> For more information on using the `getParameter` method, see the [XSS Prevention](#xss-prevention) section.
 ## Installation
 
 Preferred installation is via Composer:
@@ -277,13 +281,32 @@ public function URLAttributesTest(Router $router): void
 > Attribute names may only contain alphabetic characters (A–Z, a–z), hyphens, and underscores (i.e., a-z, A-Z, -, \_).
 
 ---
+# XSS Prevention
 
+## Get safe values from query string parameters
+
+To mitigate the risk of cross-site scripting (XSS) attacks, use the built-in `getParameter` method. This method retrieves a sanitised scalar value from a query string parameter, helping prevent the injection of malicious scripts.
+
+```php
+use AOWD\Router;
+
+$router = new Router();
+
+// URL: localhost://xss?q=<script>alert('XSS')</script>
+$router->register("get", "/xss", function () use ($router) {
+	// Will display &lt;script&gt;alert(&#039;XSS&#039;)&lt;/script&gt;
+    echo $router->getParameter('q');
+});
+
+$router->run();
+```
+
+---
 # Middleware
 
 Middleware in this routing API provides a way to intercept and process requests before they reach your route handler. This allows you to implement reusable logic such as **authentication, logging, CORS handling, rate limiting, or response modification** without duplicating code inside your route controllers.
 
 Middleware classes must implement or extend the `AOWD\Interfaces\Middleware` interface, which requires a `handle()` method. When a route is matched, any attached middleware will be executed in the order they are defined.
-
 ## Usage
 
 ### 1. Creating a Middleware
