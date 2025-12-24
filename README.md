@@ -280,6 +280,18 @@ For example, given the URI template: `segment/standard/{id}`
 Calling: `getSegment('id')`
 returns: `123`
 
+```php
+use AOWD\Router;
+
+$router = new Router();
+
+$router->register("get", "/segment/standard/{id}", function () use ($router) {
+    echo $router->getSegment('id');
+});
+
+$router->run();
+```
+
 For more information about URI template attributes, see the next section.
 ### Returning values from URL attributes
 
@@ -293,6 +305,12 @@ public function URLAttributesTest(Router $router): void
     $user_id = $router->URLAttribute("userId");
     $order_id = $router->URLAttribute("orderId");
     echo "User: $user_id Order: $order_id";
+}
+
+#[Route('/segment/attribute/{id}', 'get')]
+public function homeGetSegmentIdViaAttribute(Router $router): void
+{
+	echo $router->getSegment('id');
 }
 ```
 
