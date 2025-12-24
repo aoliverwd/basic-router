@@ -93,6 +93,12 @@ class getRoutes {
     {
         echo "User: " . $router->URLAttribute("userId", "foo");
     }
+
+    #[Route('/segment/attribute/{id}', 'get')]
+    public function homeGetSegmentIdViaAttribute(Router $router): void
+    {
+        echo $router->getSegment('id');
+    }
 }
 
 class postRoutes {
@@ -159,6 +165,10 @@ $router->register("get", "/last/segment/[0-9]+", function () use ($router) {
 
 $router->register("get", "/second/segment/[0-9]+", function () use ($router) {
     echo $router->getSegment(1);
+});
+
+$router->register("get", "/segment/standard/{id}", function () use ($router) {
+    echo $router->getSegment('id');
 });
 
 $router->register("get", "/xss", function () use ($router) {

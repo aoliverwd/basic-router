@@ -19,3 +19,16 @@ test("Get second segment", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("segment");
 });
+
+test("Get segment with identifier", function () {
+    $response = cURLCall("get", "/segment/standard/foo");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("foo");
+});
+
+
+test("Get segment with identifier using attribute", function () {
+    $response = cURLCall("get", "/segment/attribute/foo");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("foo");
+});

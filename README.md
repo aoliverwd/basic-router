@@ -257,7 +257,31 @@ The `register404` method registers a callback function to be executed when a 404
 
 1. **Callback:** A callable function or method that will be invoked when a 404 error is encountered. This callback can be used to generate custom error messages, redirect to a specific page, or perform other error handling actions.
 
-### Return from URL attributes
+### Returning values from URL segments
+
+The `getSegment` method returns a single segment value from a URI. The returned value may be an integer or a string, depending on how the segment is referenced. The method accepts either an integer index or a string key.
+#### Using an integer index
+
+When an integer is provided, it represents the position of the segment in the URI, counted from left to right, starting at `0`.
+
+For example, given the URI: `segment/standard/123`
+- `getSegment(0)` returns `segment`
+- `getSegment(1)` returns `standard`
+- `getSegment(2)` returns `123`
+
+Negative integers are also supported and count segments from right to left:
+- `getSegment(-1)` returns `123`
+- `getSegment(-2)` returns `standard`
+#### Using a string key
+
+When a string is provided, `getSegment` returns the value associated with a URI template attribute.
+
+For example, given the URI template: `segment/standard/{id}`
+Calling: `getSegment('id')`
+returns: `123`
+
+For more information about URI template attributes, see the next section.
+### Returning values from URL attributes
 
 When defining a route that includes attribute placeholders (e.g.,
 `/users/{userId}/orders/{orderId}`), you can easily retrieve those values by using the URLAttribute method.

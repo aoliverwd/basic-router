@@ -1,7 +1,11 @@
 {
     "preset": "base",
     "ignore": {
-        "words": ["php", "unregister"],
+        "words": [
+            "php",
+            "unregister",
+            "xss"
+        ],
         "paths": []
     }
 }

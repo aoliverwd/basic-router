@@ -275,8 +275,13 @@ final class Router
     /**
      * Get segment from route
      */
-    public function getSegment(int $segmentID): string
+    public function getSegment(int|string $segmentIdentifier): string|int
     {
+        // Identifer id is a URL attribute
+        if (is_string($segmentIdentifier)) {
+            return $this->URLAttribute($segmentIdentifier);
+        }
+
         $segments = is_array($this->path) && isset($this->path["path"]) ? explode("/", $this->path["path"]) : [];
 
         if (empty($segments)) {
@@ -285,11 +290,11 @@ final class Router
 
         $segments = array_values(array_filter($segments));
 
-        if ($segmentID < 0) {
-            return $segments[count($segments) - abs($segmentID)] ?? "";
+        if ($segmentIdentifier < 0) {
+            return $segments[count($segments) - abs($segmentIdentifier)] ?? "";
         }
 
-        return isset($segments[$segmentID]) ? $segments[$segmentID] : "";
+        return isset($segments[$segmentIdentifier]) ? $segments[$segmentIdentifier] : "";
     }
 
     /**
