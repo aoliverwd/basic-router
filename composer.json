@@ -40,7 +40,6 @@
     "scripts": {
         "test-local": [
             "@format",
-            "@spell",
             "@test"
         ],
         "test": [
