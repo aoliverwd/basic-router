@@ -19,7 +19,8 @@
     },
     "prefer-stable": true,
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.4",
+        "rize/uri-template": "^0.4.1"
     },
     "autoload": {
         "classmap": [

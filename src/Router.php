@@ -10,9 +10,12 @@ use AOWD\Attributes\DELETE;
 use AOWD\Attributes\POST;
 use AOWD\Attributes\GET;
 use AOWD\Attributes\PUT;
-use ReflectionClass;
-use ReflectionMethod;
 use ReflectionAttribute;
+use ReflectionMethod;
+use Rize\UriTemplate;
+use ReflectionClass;
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 final class Router
 {
@@ -31,6 +34,9 @@ final class Router
     /** @var array<string, string|int> $url_attribute_data */
     private array $url_attribute_data;
 
+    /** URI Template class */
+    private readonly UriTemplate $uri_template;
+
     /**
      * Class constructor
      */
@@ -41,6 +47,9 @@ final class Router
         $this->path = !empty($_SERVER["REQUEST_URI"])
             ? parse_url($_SERVER["REQUEST_URI"])
             : false;
+
+        // URI Template class
+        $this->uri_template = new UriTemplate();
 
         // Sanitize path
         if (isset($this->path["path"])) {
@@ -242,9 +251,7 @@ final class Router
             if (preg_match("/" . $prepend . $new_method_route . $append . "/", $route, $matches)) {
                 // Check URL attributes
                 if (isset($this->url_attributes[$method_route])) {
-                    array_shift($matches);
-                    $matches = array_values($matches);
-                    $this->url_attribute_data = array_map(fn ($key) => $matches[$key] ?? "", $this->url_attributes[$method_route]);
+                    $this->url_attribute_data = $this->url_attributes[$method_route];
                 }
 
                 $callback = $method_callback;
@@ -313,10 +320,14 @@ final class Router
     {
         $match = '\{([a-zA-Z-_]+)\}';
         if (preg_match_all('/' . $match . '/', $route, $matches)) {
-            $ref_url = preg_replace('/' . $match . '/', '(\S*?)', $route);
-            if (!empty($ref_url)) {
-                $this->url_attributes[$ref_url] = array_flip($matches[1]);
-                return $ref_url;
+            $params = $this->uri_template->extract($route, ($this->path['path'] ?? ""), true);
+            if ($params) {
+                $ref_url = $this->uri_template->expand($route, $params);
+
+                if (!empty($ref_url)) {
+                    $this->url_attributes[$ref_url] = $params;
+                    return $ref_url;
+                }
             }
         }
 
