@@ -349,7 +349,6 @@ final class Router
 
             // Has query string
             if ($this->hasQueryString($route)) {
-                // $path .= '?' . http_build_query($this->path['query'] ?? []);
                 $path = $this->safeURI();
             }
 
@@ -357,9 +356,6 @@ final class Router
 
             if ($params) {
                 $this->url_attributes[$route] = $params;
-                // $ref_url = $this->uri_template->expand($route, $params);
-                // $this->url_attributes[$ref_url] = $params;
-                // return $ref_url;
             }
         }
 
