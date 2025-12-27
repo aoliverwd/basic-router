@@ -65,6 +65,12 @@ final class Router
         }
     }
 
+    // Return Sanitized URI string
+    private function safeURI(): string
+    {
+        return ($this->path["path"] ?? "") . (isset($this->path["query"]) ? "?" . http_build_query($this->path['query']) : "");
+    }
+
     /**
      * Register a controller and its route attributes
      * @param  object $controllers
@@ -244,12 +250,16 @@ final class Router
         }
 
         foreach ($this->methods[$method] as $method_route => $method_callback) {
+
             $prepend = substr($method_route, 1) !== "^" ? "^" : "";
             $append = substr($method_route, -1) !== '$' ? '$' : "";
-            $new_method_route = str_replace("/", "\/", $method_route);
+            $new_method_route = str_replace(["/", "?"], ["\/", "\?"], $method_route);
 
-            if (preg_match("/" . $prepend . $new_method_route . $append . "/", $route, $matches)) {
-                // Check URL attributes
+            if (
+                $this->isURITemplate($method_route)
+                && $this->uri_template->extract($method_route, $this->safeURI(), true)
+                || preg_match("/" . $prepend . $new_method_route . $append . "/", $route)
+            ) {
                 if (isset($this->url_attributes[$method_route])) {
                     $this->url_attribute_data = $this->url_attributes[$method_route];
                 }
@@ -309,25 +319,47 @@ final class Router
      */
     private function formatRoute(string $route): string
     {
-        $append_slash = (strlen($route) > 1 && substr($route, -1) !== "/" ? "/" : "");
-        return $this->registerURLAttributes($route . $append_slash);
+        if (!preg_match('/\?/', $route)) {
+            $route .= (strlen($route) > 1 && substr($route, -1) !== "/" ? "/" : "");
+        }
+
+        return $this->registerURLAttributes($route);
     }
 
     /**
-     * Register URL attributes I.E /users/{userId}/orders/{orderId}
+     * Check if provided string is a URI template
+     */
+    private function isURITemplate(string $route): bool
+    {
+        return preg_match_all('/\{(.*?)\}/', $route) ? true : false;
+    }
+
+    private function hasQueryString(string $route): bool
+    {
+        return preg_match('/\{\?(.*?)\}|\?/', $route) ? true : false;
+    }
+
+    /**
+     * Register URL attributes I.E /search/{term:1}/{term}/{?q*,limit}
      */
     private function registerURLAttributes(string $route): string
     {
-        $match = '\{([a-zA-Z-_]+)\}';
-        if (preg_match_all('/' . $match . '/', $route, $matches)) {
-            $params = $this->uri_template->extract($route, ($this->path['path'] ?? ""), true);
-            if ($params) {
-                $ref_url = $this->uri_template->expand($route, $params);
+        if ($this->isURITemplate($route)) {
+            $path = $this->path['path'] ?? "";
 
-                if (!empty($ref_url)) {
-                    $this->url_attributes[$ref_url] = $params;
-                    return $ref_url;
-                }
+            // Has query string
+            if ($this->hasQueryString($route)) {
+                // $path .= '?' . http_build_query($this->path['query'] ?? []);
+                $path = $this->safeURI();
+            }
+
+            $params = $this->uri_template->extract($route, $path, true);
+
+            if ($params) {
+                $this->url_attributes[$route] = $params;
+                // $ref_url = $this->uri_template->expand($route, $params);
+                // $this->url_attributes[$ref_url] = $params;
+                // return $ref_url;
             }
         }
 

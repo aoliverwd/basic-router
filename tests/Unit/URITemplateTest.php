@@ -19,3 +19,14 @@ test("Register via method", function () {
     expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
     expect($response["response"])->toBe("Author: jane-doe ID: 223658");
 });
+
+test("Get request with query string", function () {
+    $response = cURLCall("get", "/search/1222/wddwdwd/?q=test&limit=2");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(200);
+    expect($response["response"])->toBe("URI Template test");
+});
+
+test("Get request with query string 404", function () {
+    $response = cURLCall("get", "/search/w/wddwdwd/?q=test2");
+    expect($response["headers"]["http_code"])->toBeInt()->ToBe(404);
+});

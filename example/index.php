@@ -143,7 +143,9 @@ function echoMessage(string $message): void
 }
 
 $router->register404(fn() => echoMessage("page not found"));
+
 // $router->register("get", "/", fn() => echoMessage("Hello world"));
+$router->register("get", "/search/{term:1}/{term}/{?q*,limit}", fn() => echoMessage("URI Template test"));
 $router->register("get", "/test", fn() => echoMessage("get test"));
 $router->register("put", "/test", fn() => echoMessage("put test"));
 $router->register("post", "/test", fn() => echoMessage("post test"));
